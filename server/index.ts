@@ -107,8 +107,12 @@ export async function setupApp(app: Express, server?: Server): Promise<void> {
   }
 }
 
-// Only start server if not in serverless environment (Vercel)
-if (!process.env.VERCEL) {
+// Start server if not in Vercel production environment
+// Vercel dev mode sets VERCEL but VERCEL_ENV is not 'production'
+const isVercelProduction = process.env.VERCEL && process.env.VERCEL_ENV === 'production';
+const shouldStartServer = !isVercelProduction;
+
+if (shouldStartServer) {
   (async () => {
     const app = await createApp();
     const server = createServer(app);
