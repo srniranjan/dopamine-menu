@@ -7,13 +7,18 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "/api/index.js"
+            "destination": "/api/index"
         },
         {
             "source": "/(.*)",
-            "destination": "/api/index.js"
+            "destination": "/api/index"
         }
     ],
+    "functions": {
+        "api/index.ts": {
+            "includeFiles": "server/**"
+        }
+    },
     "env": {
         "NODE_ENV": "production"
     }
