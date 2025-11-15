@@ -7,6 +7,17 @@ import { z } from "zod";
 export async function registerRoutes(app: Express): Promise<Server> {
   console.log("Registering routes...");
   
+  // Stack Auth handler routes - must come before API routes
+  // These routes are handled client-side by StackHandler, but we need to ensure
+  // they're not blocked and reach the React app
+  app.all('/handler/*', (req, res, next) => {
+    // Let the request pass through to the static file handler
+    // The serveStatic() catch-all will serve index.html for these routes
+    // which allows the client-side StackHandler to handle OAuth callbacks
+    console.log(`[Handler Route] ${req.method} ${req.path}`);
+    next();
+  });
+  
   // Activity routes
   app.get("/api/activities", async (req, res) => {
     try {

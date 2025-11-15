@@ -10,6 +10,7 @@ export const stackServerApp = new StackServerApp({
     signIn: '/handler/sign-in',
     signUp: '/handler/sign-up',
     afterSignOut: '/handler/sign-in',
+    oauthCallback: '/handler/oauth-callback',
   },
 });
 
