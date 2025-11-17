@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useUser } from '@stackframe/react';
 import { useToast } from '@/hooks/use-toast';
+import { buildApiUrl } from '@/lib/queryClient';
 
 export function AuthSync() {
   const stackUser = useUser();
@@ -77,7 +78,7 @@ export function AuthSync() {
     const syncUser = async () => {
       try {
         console.log('[AuthSync] Making fetch request to /api/users/sync');
-        const response = await fetch('/api/users/sync', {
+        const response = await fetch(buildApiUrl('/api/users/sync'), {
           method: 'POST',
           credentials: 'include',
           headers: {

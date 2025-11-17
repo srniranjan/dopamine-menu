@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Play, Pause, RotateCcw, ExternalLink, Music, Smartphone, Headphones, X } from "lucide-react";
+import { buildApiUrl } from "@/lib/queryClient";
 
 interface InteractiveActivityProps {
   activity: {
@@ -109,8 +110,9 @@ export default function InteractiveActivity({ activity, onClose }: InteractiveAc
     
     // Track activity completion
     if (activity.id) {
-      fetch(`/api/activities/${activity.id}/complete`, {
+      fetch(buildApiUrl(`/api/activities/${activity.id}/complete`), {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

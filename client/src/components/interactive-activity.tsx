@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Play, Pause, RotateCcw, ExternalLink, Music, Smartphone, Headphones, Edit, Save, X } from "lucide-react";
 import { useTimer } from "@/hooks/use-timer";
 import { useToast } from "@/hooks/use-toast";
+import { buildApiUrl } from "@/lib/queryClient";
 
 interface InteractiveActivityProps {
   activity: {
@@ -129,8 +130,9 @@ export default function InteractiveActivity({ activity, onClose, onComplete }: I
     
     // Track activity completion
     if (activity.id) {
-      fetch(`/api/activities/${activity.id}/complete`, {
+      fetch(buildApiUrl(`/api/activities/${activity.id}/complete`), {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -148,8 +150,9 @@ export default function InteractiveActivity({ activity, onClose, onComplete }: I
   
   const handleEditSave = async () => {
     try {
-      const response = await fetch(`/api/activities/${activity.id}`, {
+      const response = await fetch(buildApiUrl(`/api/activities/${activity.id}`), {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

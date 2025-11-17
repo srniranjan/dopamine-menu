@@ -9,7 +9,7 @@ const API_BASE_URL =
 
 const isAbsoluteUrl = (url: string) => /^https?:\/\//i.test(url);
 
-const buildApiUrl = (pathOrUrl: string): string => {
+export const buildApiUrl = (pathOrUrl: string): string => {
   if (isAbsoluteUrl(pathOrUrl) || !API_BASE_URL) {
     return pathOrUrl;
   }
