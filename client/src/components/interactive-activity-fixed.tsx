@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Play, Pause, RotateCcw, ExternalLink, Music, Smartphone, Headphones, X } from "lucide-react";
 import { useTimer } from "@/hooks/use-timer";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl, withStackUserHeader } from "@/lib/queryClient";
 
 interface InteractiveActivityProps {
   activity: {
@@ -104,9 +104,9 @@ export default function InteractiveActivity({ activity, onClose }: InteractiveAc
       fetch(buildApiUrl(`/api/activities/${activity.id}/complete`), {
         method: 'POST',
         credentials: 'include',
-        headers: {
+        headers: withStackUserHeader({
           'Content-Type': 'application/json',
-        },
+        }),
         body: JSON.stringify({
           duration: activity.duration,
         }),

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useUser } from '@stackframe/react';
 import { useToast } from '@/hooks/use-toast';
-import { buildApiUrl } from '@/lib/queryClient';
+import { buildApiUrl, setStackUserId, withStackUserHeader } from '@/lib/queryClient';
 
 export function AuthSync() {
   const stackUser = useUser();
@@ -9,6 +9,10 @@ export function AuthSync() {
   const syncInProgressRef = useRef(false);
   const hasSyncedRef = useRef(false); // Track if we've synced this session
   const { toast } = useToast();
+
+  useEffect(() => {
+    setStackUserId(stackUser?.id ?? null);
+  }, [stackUser?.id]);
 
   useEffect(() => {
     const prevUser = prevUserRef.current;
@@ -81,9 +85,9 @@ export function AuthSync() {
         const response = await fetch(buildApiUrl('/api/users/sync'), {
           method: 'POST',
           credentials: 'include',
-          headers: {
+          headers: withStackUserHeader({
             'Content-Type': 'application/json',
-          },
+          }),
           body: JSON.stringify({
             stackUserId: stackUser.id,
             username: stackUser.primaryEmail || stackUser.id,

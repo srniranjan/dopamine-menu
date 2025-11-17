@@ -49,9 +49,16 @@ export async function createApp(): Promise<Express> {
         cookies: req.headers.cookie || ''
       };
       
-      const stackUser = await stackServerApp.getUser({ tokenStore: requestLike as any });
+      const stackUser = await stackServerApp.getUser({
+        tokenStore: requestLike as any,
+      });
       if (stackUser) {
         (req as any).stackUserId = stackUser.id; // No DB call!
+      } else {
+        const headerUserId = req.header("x-stack-user-id");
+        if (headerUserId) {
+          (req as any).stackUserId = headerUserId;
+        }
       }
       // If no stackUser, stackUserId will be undefined - routes can handle this
     } catch (error) {

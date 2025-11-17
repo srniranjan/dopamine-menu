@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Play, Pause, RotateCcw, ExternalLink, Music, Smartphone, Headphones, Edit, Save, X } from "lucide-react";
 import { useTimer } from "@/hooks/use-timer";
 import { useToast } from "@/hooks/use-toast";
-import { buildApiUrl } from "@/lib/queryClient";
+import { buildApiUrl, withStackUserHeader } from "@/lib/queryClient";
 
 interface InteractiveActivityProps {
   activity: {
@@ -133,9 +133,9 @@ export default function InteractiveActivity({ activity, onClose, onComplete }: I
       fetch(buildApiUrl(`/api/activities/${activity.id}/complete`), {
         method: 'POST',
         credentials: 'include',
-        headers: {
+        headers: withStackUserHeader({
           'Content-Type': 'application/json',
-        },
+        }),
         body: JSON.stringify({
           duration: activity.duration,
         }),
@@ -153,9 +153,9 @@ export default function InteractiveActivity({ activity, onClose, onComplete }: I
       const response = await fetch(buildApiUrl(`/api/activities/${activity.id}`), {
         method: 'PUT',
         credentials: 'include',
-        headers: {
+        headers: withStackUserHeader({
           'Content-Type': 'application/json',
-        },
+        }),
         body: JSON.stringify({
           name: editForm.name,
           duration: editForm.duration || null,

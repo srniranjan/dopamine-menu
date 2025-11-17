@@ -21,6 +21,26 @@ export const buildApiUrl = (pathOrUrl: string): string => {
   return `${API_BASE_URL}${normalizedPath}`;
 };
 
+let cachedStackUserId: string | null = null;
+
+export function setStackUserId(userId: string | null | undefined) {
+  cachedStackUserId = userId ?? null;
+}
+
+export function getStackUserId(): string | null {
+  return cachedStackUserId;
+}
+
+export function withStackUserHeader(
+  headers: Record<string, string> = {},
+): Record<string, string> {
+  const stackUserId = getStackUserId();
+  if (stackUserId) {
+    return { ...headers, "x-stack-user-id": stackUserId };
+  }
+  return headers;
+}
+
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
@@ -35,7 +55,9 @@ export async function apiRequest(
 ): Promise<Response> {
   const res = await fetch(buildApiUrl(pathOrUrl), {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers: withStackUserHeader(
+      data ? { "Content-Type": "application/json" } : {},
+    ),
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -62,6 +84,7 @@ export const getQueryFn: <T>(options: {
     const url = buildApiUrl(`/${normalizedPath}`);
     const res = await fetch(url, {
       credentials: "include",
+      headers: withStackUserHeader(),
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
@@ -72,6 +95,7 @@ export const getQueryFn: <T>(options: {
     return await res.json();
   };
 
+// Factory to create per-user query clients
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
