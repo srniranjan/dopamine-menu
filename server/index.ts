@@ -10,6 +10,28 @@ export async function createApp(): Promise<Express> {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
+  const clientOrigin = process.env.CLIENT_ORIGIN;
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (clientOrigin && origin === clientOrigin) {
+      res.header("Access-Control-Allow-Origin", origin);
+      res.header("Access-Control-Allow-Credentials", "true");
+    }
+    res.header("Vary", "Origin");
+    if (req.method === "OPTIONS") {
+      res.header(
+        "Access-Control-Allow-Methods",
+        "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+      );
+      res.header(
+        "Access-Control-Allow-Headers",
+        req.headers["access-control-request-headers"] || "Content-Type",
+      );
+      return res.sendStatus(204);
+    }
+    next();
+  });
+
   // Middleware to extract stackUserId from Stack authentication (no DB call)
   app.use(async (req, res, next) => {
     try {
