@@ -431,69 +431,26 @@ export default function Onboarding() {
   if (currentStep === 0) {
     return (
       <div 
-        className="welcome-screen min-h-screen flex flex-col relative"
-        style={{
-          backgroundImage: `linear-gradient(135deg, 
-            rgba(138, 43, 226, 0.4) 0%,
-            rgba(236, 72, 153, 0.3) 25%,
-            rgba(168, 85, 247, 0.3) 50%,
-            rgba(147, 51, 234, 0.4) 75%,
-            rgba(59, 130, 246, 0.4) 100%
-          ), url(${backgroundImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
+        className="h-screen flex flex-col relative overflow-hidden items-center justify-center gap-8 p-6 max-w-lg mx-auto"
       >
-        {/* Floating Background Orbs */}
-        <div className="bg-shapes">
-          <div className="floating-orb orb-1"></div>
-          <div className="floating-orb orb-2"></div>
-          <div className="floating-orb orb-3"></div>
-        </div>
-
-        {/* Content Container */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-16 relative z-20">
-          {/* Main Content */}
-          <div className="text-center space-y-12 max-w-lg mx-auto">
-            {/* Hero Icon */}
-            <div className="flex justify-center">
-              <div className="w-32 h-32 glass-card rounded-full flex items-center justify-center relative">
-                <Heart className="w-16 h-16 text-white neon-icon" />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent"></div>
-              </div>
-            </div>
-
-            {/* Typography */}
-            <div className="space-y-6">
-              <h1 className="welcome-title youth-text text-center">
-                Welcome to Your<br />Dopamine Menu
-              </h1>
-              <p className="welcome-subtitle text-white/90 text-center leading-relaxed">
-                Create activities organized like a restaurant menu for when your brain needs stimulation
-              </p>
-            </div>
-
-            {/* Glass Card with Details */}
-            <div className="glass-card rounded-3xl p-8 space-y-4">
-              <p className="text-white/80 text-lg leading-relaxed">
-                Takes 3-5 minutes. We'll guide you through each step.
-              </p>
-            </div>
+          <h1 className="welcome-title text-center">
+            Welcome to Your<br />Dopamine Menu
+          </h1>
+          <p className="welcome-subtitle text-white/90 text-center leading-relaxed">
+            Create activities organized like a restaurant menu for when your brain needs stimulation
+          </p>
+          <div className="glass-card rounded-3xl p-4 space-y-4">
+            <p className="text-white/80 text-lg text-center leading-relaxed">
+              Takes 3-5 minutes. We'll guide you through each step.
+            </p>
           </div>
-        </div>
-
-        {/* Bottom Action */}
-        <div className="relative z-20 px-6 pb-8">
-          <div className="max-w-sm mx-auto">
-            <Button 
-              onClick={handleNext}
-              className="glass-button w-full h-16 text-lg font-semibold text-white border-0 rounded-2xl"
-            >
-              <span>Let's Get Started</span>
-              <ChevronRight className="w-6 h-6 ml-2" />
-            </Button>
-          </div>
-        </div>
+          <Button 
+            onClick={handleNext}
+            className="glass-button w-full h-16 text-lg font-semibold text-white border-0 rounded-2xl mt-2"
+          >
+            <span>Let's Get Started</span>
+            <ChevronRight className="w-6 h-6 ml-2" />
+          </Button>
       </div>
     );
   }
