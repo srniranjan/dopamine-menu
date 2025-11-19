@@ -279,7 +279,7 @@ export default function Onboarding() {
                         }));
                       }}
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3 h-3 text-blue-600 hover:text-blue-800" />
                     </Button>
                   </div>
                 ))}

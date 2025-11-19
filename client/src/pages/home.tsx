@@ -248,7 +248,7 @@ export default function Home() {
   // HOME SCREEN - 4 Category Menu
   if (viewState === 'home') {
     return (
-      <div className="vibrant-bg relative overflow-hidden">
+      <div className="h-screen flex flex-col gap-6 relative overflow-hidden max-w-lg mx-auto">
         {/* Animated background shapes */}
         <div className="bg-shapes">
           <div className="shape"></div>
@@ -256,7 +256,7 @@ export default function Home() {
           <div className="shape"></div>
         </div>
 
-        <header className="flex justify-between items-center p-4 relative z-10">
+        <header className="flex justify-between items-center p-6 relative z-10">
           <div>
             <h1 className="text-2xl font-black text-white mb-1 tracking-wide">DOPAMINE MENU</h1>
             <p className="text-white/80 text-sm font-medium">What sounds good right now?</p>
@@ -269,7 +269,7 @@ export default function Home() {
           </Button>
         </header>
 
-        <main className="px-4 py-6 relative z-10 flex-1 flex flex-col justify-center">
+        <main className="relative px-6 z-10 flex-1 flex flex-col">
           {/* Main 2x2 grid */}
           <div className="grid grid-cols-2 gap-4 mb-4">
             {['appetizers', 'entrees', 'sides', 'desserts'].map((key) => {
@@ -340,33 +340,33 @@ export default function Home() {
     const info = categoryInfo[selectedCategory];
 
     return (
-      <div className="vibrant-bg relative overflow-hidden">
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
         <div className="bg-shapes">
           <div className="shape"></div>
           <div className="shape"></div>
           <div className="shape"></div>
         </div>
 
-        <header className="flex items-center p-6 relative z-10">
+        <header className="flex flex-wrap items-center justify-between py-6 px-4 relative z-10 sm:flex-nowrap">
           <Button 
             onClick={() => setViewState('home')} 
-            className="glass-card p-3 mr-4 border border-white/30 hover:border-white/50"
+            className="glass-card p-3 border border-white/30 hover:border-white/50 shrink-0"
           >
             <ArrowLeft className="w-6 h-6 text-white" />
           </Button>
-          <div className="flex-1">
+          <div className="">
             <h1 className="text-3xl font-black text-white tracking-wide mb-1">{info.name}</h1>
             <p className="text-white/80 text-lg font-medium">{info.description}</p>
           </div>
-          <div className="flex space-x-3">
-            <Button onClick={() => setShowAddDialog(true)} className="neon-button">
-              <Plus className="w-5 h-5 mr-2" />
-              Add
+          <div className="">
+            <Button onClick={() => setShowAddDialog(true)} className="neon-button w-6 h-8 flex items-center justify-center p-0">
+              <Plus className="w-5 h-5" />
+              <span className="sr-only">Add</span>
             </Button>
           </div>
         </header>
 
-        <main className="p-6 relative z-10">
+        <main className="pb-6 px-4 relative z-10">
           {categoryActivities.length > 0 ? (
             <div className="space-y-4">
               {categoryActivities.map((activity: Activity) => (
@@ -425,14 +425,14 @@ export default function Home() {
     };
 
     return (
-      <div className="vibrant-bg relative overflow-hidden">
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
         <div className="bg-shapes">
           <div className="shape"></div>
           <div className="shape"></div>
           <div className="shape"></div>
         </div>
 
-        <header className="flex items-center justify-between p-6 relative z-10">
+        <header className="flex items-center justify-between px-6 pt-6 relative z-10">
           <Button onClick={handleCancel} className="glass-card p-3 border border-white/30 hover:border-white/50">
             <X className="w-6 h-6 text-white" />
           </Button>
@@ -441,9 +441,8 @@ export default function Home() {
           </Button>
         </header>
 
-        <main className="p-6 text-center space-y-12 relative z-10">
-          <div className="neon-accent">
-            <div className="text-8xl mb-6">{selectedActivity.emoji || '⭐'}</div>
+        <main className="p-6 text-center space-y-8 relative z-10">
+          <div className="neon-accent p-4 rounded-2xl">
             <h1 className="bold-title mb-4">{selectedActivity.name.toUpperCase()}</h1>
             <p className="text-white/80 text-xl font-semibold capitalize">{selectedActivity.category.replace('_', ' ')}</p>
           </div>
@@ -451,7 +450,7 @@ export default function Home() {
           {isTimerActivity ? (
             <div className="space-y-8">
               <div className="glass-card p-8 mx-4">
-                <div className="text-8xl font-black text-white mb-4 drop-shadow-lg">
+                <div className="bold-title font-black text-white mb-4 drop-shadow-lg">
                   {formatTime(time)}
                 </div>
               </div>
@@ -526,14 +525,14 @@ export default function Home() {
   // EDIT ACTIVITY SCREEN
   if (viewState === 'edit-activity' && editingActivity) {
     return (
-      <div className="vibrant-bg relative overflow-hidden">
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
         <div className="bg-shapes">
           <div className="shape"></div>
           <div className="shape"></div>
           <div className="shape"></div>
         </div>
 
-        <header className="flex items-center p-6 relative z-10">
+        <header className="flex items-center p-6 gap-4 relative z-10">
           <Button onClick={() => setViewState('activity')} className="glass-card p-3 mr-4 border border-white/30 hover:border-white/50">
             <ArrowLeft className="w-6 h-6 text-white" />
           </Button>
@@ -596,11 +595,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex space-x-4">
-            <Button onClick={handleSaveEdit} className="flex-1 neon-button text-xl py-6">
+          <div className="flex flex-col space-y-4">
+            <Button onClick={handleSaveEdit} className="neon-button text-xl py-6">
               SAVE CHANGES
             </Button>
-            <Button onClick={() => setViewState('activity')} className="flex-1 glass-card border border-white/30 hover:border-white/50 text-white font-bold text-xl py-6">
+            <Button onClick={() => setViewState('activity')} className="glass-button bg-transparent text-xl py-6">
               Cancel
             </Button>
           </div>
@@ -612,7 +611,7 @@ export default function Home() {
   // SETTINGS SCREEN
   if (viewState === 'settings') {
     return (
-      <div className="vibrant-bg relative overflow-hidden">
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
         <div className="bg-shapes">
           <div className="shape"></div>
           <div className="shape"></div>
