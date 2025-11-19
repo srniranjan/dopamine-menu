@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -66,6 +67,8 @@ const categoryInfo = {
   }
 };
 
+type ModalCategory = keyof typeof categoryInfo;
+
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedActivities, setSelectedActivities] = useState<Record<CategoryType, string[]>>({
@@ -103,6 +106,7 @@ export default function Onboarding() {
   const [newActivityName, setNewActivityName] = useState('');
   const [newActivityEmoji, setNewActivityEmoji] = useState('');
   const [newActivityDuration, setNewActivityDuration] = useState<number | ''>('');
+  const [activeModalCategory, setActiveModalCategory] = useState<ModalCategory | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -120,6 +124,45 @@ export default function Onboarding() {
       });
     },
   });
+
+  const resetCustomActivityForm = () => {
+    setNewActivityName('');
+    setNewActivityEmoji('');
+    setNewActivityDuration('');
+  };
+
+  const handleOpenCustomModal = (category: ModalCategory) => {
+    resetCustomActivityForm();
+    setActiveModalCategory(category);
+  };
+
+  const handleCloseCustomModal = () => {
+    resetCustomActivityForm();
+    setActiveModalCategory(null);
+  };
+
+  const handleAddCustomActivity = () => {
+    if (!activeModalCategory) return;
+    const trimmedName = newActivityName.trim();
+    if (!trimmedName) return;
+
+    const newActivity = {
+      name: trimmedName,
+      emoji: newActivityEmoji.trim() || undefined,
+      duration: typeof newActivityDuration === 'number' ? newActivityDuration : undefined
+    };
+
+    setCustomActivities(prev => ({
+      ...prev,
+      [activeModalCategory as CategoryType]: [...prev[activeModalCategory as CategoryType], newActivity]
+    }));
+    setSelectedActivities(prev => ({
+      ...prev,
+      [activeModalCategory as CategoryType]: [...prev[activeModalCategory as CategoryType], newActivity.name]
+    }));
+
+    handleCloseCustomModal();
+  };
 
   const steps: OnboardingStep[] = [
     {
@@ -149,157 +192,101 @@ export default function Onboarding() {
       subtitle: info.subtitle,
       content: (
         <div className="space-y-6">
-          
-          <div className="space-y-4">
-            <p className="text-sm text-slate-700">{info.description}</p>
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800"><strong>Tip:</strong> {info.tip}</p>
+          <p className="text-sm text-slate-700">{info.description}</p>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <Label htmlFor={`templates-${category}`} className="text-base font-semibold text-slate-800">
+                Include popular {info.title.toLowerCase()}
+              </Label>
+              <p className="text-sm text-slate-700 mt-1">Add tried-and-tested activities to get started</p>
             </div>
-          </div>
-
-          <div className="space-y-6 border-t pt-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex-1">
-                <Label htmlFor={`templates-${category}`} className="text-base font-semibold text-slate-800">
-                  Include popular {info.title.toLowerCase()}
-                </Label>
-                <p className="text-sm text-slate-700 mt-1">Add tried-and-tested activities to get started</p>
-              </div>
-              <div className="flex-shrink-0">
-                <Switch
-                  id={`templates-${category}`}
-                  checked={includeTemplates[category as CategoryType]}
-                  className="data-[state=unchecked]:bg-slate-300"
-                  onCheckedChange={(checked) => {
-                  setIncludeTemplates(prev => ({
+            <Switch
+                id={`templates-${category}`}
+                checked={includeTemplates[category as CategoryType]}
+                className="data-[state=unchecked]:bg-slate-300"
+                onCheckedChange={(checked) => {
+                setIncludeTemplates(prev => ({
+                  ...prev,
+                  [category]: checked
+                }));
+                if (checked) {
+                  // Add all template activities
+                  const templateNames = exampleActivities[category as CategoryType]?.map(a => a.name) || [];
+                  setSelectedActivities(prev => ({
                     ...prev,
-                    [category]: checked
+                    [category]: Array.from(new Set([...prev[category as CategoryType], ...templateNames]))
                   }));
-                  if (checked) {
-                    // Add all template activities
-                    const templateNames = exampleActivities[category as CategoryType]?.map(a => a.name) || [];
-                    setSelectedActivities(prev => ({
-                      ...prev,
-                      [category]: Array.from(new Set([...prev[category as CategoryType], ...templateNames]))
-                    }));
-                  } else {
-                    // Remove template activities but keep custom ones
-                    const templateNames = exampleActivities[category as CategoryType]?.map(a => a.name) || [];
-                    setSelectedActivities(prev => ({
-                      ...prev,
-                      [category]: prev[category as CategoryType].filter(name => !templateNames.includes(name))
-                    }));
-                  }
-                  }}
-                />
-              </div>
-            </div>
-            
-            {includeTemplates[category as CategoryType] && (
-              <div className="space-y-3">
-                <p className="text-sm text-slate-700 font-medium">Popular activities added:</p>
-                <div className="grid gap-2">
-                  {exampleActivities[category as CategoryType]?.slice(0, 3).map((activity, index) => (
-                    <div key={index} className="text-sm p-3 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                      {activity.name}
-                    </div>
-                  )) || []}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-6 border-t pt-6">
-            <h4 className="font-semibold text-base text-slate-800">Add your own {info.title.toLowerCase()}</h4>
-            <div className="space-y-4">
-              <Input
-                placeholder={`Enter a ${category.slice(0, -1)} activity...`}
-                value={newActivityName}
-                onChange={(e) => setNewActivityName(e.target.value)}
-                className="rounded-none"
-              />
-              <div className="flex gap-3">
-                <Input
-                  placeholder="🎵 Emoji"
-                  value={newActivityEmoji}
-                  onChange={(e) => setNewActivityEmoji(e.target.value)}
-                  className="w-24 rounded-none text-center"
-                  maxLength={2}
-                />
-                <Input
-                  type="number"
-                  placeholder="Duration (minutes)"
-                  value={newActivityDuration}
-                  onChange={(e) => setNewActivityDuration(e.target.value === '' ? '' : parseInt(e.target.value))}
-                  className="flex-1 rounded-none"
-                  min={0}
-                />
-              </div>
-              <Button
-                onClick={() => {
-                  if (newActivityName.trim()) {
-                    const newActivity = {
-                      name: newActivityName.trim(),
-                      emoji: newActivityEmoji.trim() || undefined,
-                      duration: typeof newActivityDuration === 'number' ? newActivityDuration : undefined
-                    };
-                    setCustomActivities(prev => ({
-                      ...prev,
-                      [category]: [...prev[category as CategoryType], newActivity]
-                    }));
-                    setSelectedActivities(prev => ({
-                      ...prev,
-                      [category]: [...prev[category as CategoryType], newActivity.name]
-                    }));
-                    setNewActivityName('');
-                    setNewActivityEmoji('');
-                    setNewActivityDuration('');
-                  }
+                } else {
+                  // Remove template activities but keep custom ones
+                  const templateNames = exampleActivities[category as CategoryType]?.map(a => a.name) || [];
+                  setSelectedActivities(prev => ({
+                    ...prev,
+                    [category]: prev[category as CategoryType].filter(name => !templateNames.includes(name))
+                  }));
+                }
                 }}
-                disabled={!newActivityName.trim()}
-                className="w-full h-10"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Activity
-              </Button>
-              
-              {customActivities[category as CategoryType].length > 0 && (
-                <div className="space-y-3">
-                  <p className="text-sm text-slate-700 font-medium">Your custom activities:</p>
-                  {customActivities[category as CategoryType].map((activity, index) => (
-                    <div key={index} className="flex items-start justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <div className="flex-1">
-                        <div className="text-base font-medium text-blue-900">
-                          {activity.emoji && <span className="mr-2">{activity.emoji}</span>}
-                          {activity.name}
-                          {activity.duration && activity.duration > 0 && (
-                            <span className="ml-2 text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">
-                              {activity.duration}m
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setCustomActivities(prev => ({
-                            ...prev,
-                            [category]: prev[category as CategoryType].filter((_, i) => i !== index)
-                          }));
-                          setSelectedActivities(prev => ({
-                            ...prev,
-                            [category]: prev[category as CategoryType].filter(name => name !== activity.name)
-                          }));
-                        }}
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              />
+          </div>  
+          {includeTemplates[category as CategoryType] && (
+            <div className="space-y-3">
+              <p className="text-sm text-slate-700 font-medium">Popular activities added:</p>
+              <div className="grid gap-2">
+                {exampleActivities[category as CategoryType]?.slice(0, 3).map((activity, index) => (
+                  <div key={index} className="text-sm p-3 bg-green-50 border border-green-200 rounded-lg text-green-800">
+                    {activity.name}
+                  </div>
+                )) || []}
+              </div>
             </div>
+          )}
+          <div className="space-y-6 border-t">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => handleOpenCustomModal(category as ModalCategory)}
+            >
+              <Plus className="w-4 h-4" />
+              Add custom {info.title.toLowerCase()}
+            </Button>
+
+            {customActivities[category as CategoryType].length > 0 ? (  
+              <div className="space-y-3">
+                <p className="text-sm text-slate-700 font-medium">Your custom activities:</p>
+                {customActivities[category as CategoryType].map((activity, index) => (
+                  <div key={index} className="flex items-start justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex-1">
+                      <div className="text-base font-medium text-blue-900">
+                        {activity.emoji && <span className="mr-2">{activity.emoji}</span>}
+                        {activity.name}
+                        {activity.duration && activity.duration > 0 && (
+                          <span className="ml-2 text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">
+                            {activity.duration}m
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setCustomActivities(prev => ({
+                          ...prev,
+                          [category as CategoryType]: prev[category as CategoryType].filter((_, i) => i !== index)
+                        }));
+                        setSelectedActivities(prev => ({
+                          ...prev,
+                          [category as CategoryType]: prev[category as CategoryType].filter(name => name !== activity.name)
+                        }));
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500 italic">No custom {info.title.toLowerCase()} added yet.</p>
+            )}
           </div>
 
           {hasAttemptedContinue[category as CategoryType] && selectedActivities[category as CategoryType].length === 0 && (
@@ -426,102 +413,173 @@ export default function Onboarding() {
   // Don't count welcome step in progress - start counting from step 2
   const progress = currentStep === 0 ? 0 : ((currentStep) / (steps.length - 1)) * 100;
   const currentStepData = steps[currentStep];
+  const modalCategoryInfo = activeModalCategory ? categoryInfo[activeModalCategory] : null;
+  const singularModalCategory = activeModalCategory
+    ? (activeModalCategory.endsWith('s') ? activeModalCategory.slice(0, -1) : activeModalCategory)
+    : '';
+
+  const customActivityModal = (
+    <Dialog
+      open={!!activeModalCategory}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleCloseCustomModal();
+        }
+      }}
+    >
+      <DialogContent>
+        {modalCategoryInfo && (
+          <>
+            <DialogHeader>
+              <DialogTitle>
+                Add a custom {modalCategoryInfo.title.toLowerCase()}
+              </DialogTitle>
+              <DialogDescription>
+                Capture the activities that uniquely energize you and keep them handy in your dopamine menu.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <Input
+                placeholder={`Enter a ${singularModalCategory || 'custom'} activity...`}
+                value={newActivityName}
+                onChange={(e) => setNewActivityName(e.target.value)}
+              />
+              <div className="flex gap-3">
+                <Input
+                  placeholder="🎵 Emoji"
+                  value={newActivityEmoji}
+                  onChange={(e) => setNewActivityEmoji(e.target.value)}
+                  className="w-24 text-center"
+                  maxLength={2}
+                />
+                <Input
+                  type="number"
+                  placeholder="Duration (minutes)"
+                  value={newActivityDuration}
+                  onChange={(e) => setNewActivityDuration(e.target.value === '' ? '' : parseInt(e.target.value))}
+                  className="flex-1"
+                  min={0}
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="ghost" onClick={handleCloseCustomModal}>
+                Cancel
+              </Button>
+              <Button onClick={handleAddCustomActivity} disabled={!newActivityName.trim()}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Activity
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 
   // Render welcome screen with full-screen aesthetic
   if (currentStep === 0) {
     return (
-      <div 
-        className="h-screen flex flex-col relative overflow-hidden items-center justify-center gap-8 p-6 max-w-lg mx-auto"
-      >
-          <h1 className="welcome-title text-center">
-            Welcome to Your<br />Dopamine Menu
-          </h1>
-          <p className="welcome-subtitle text-white/90 text-center leading-relaxed">
-            Create activities organized like a restaurant menu for when your brain needs stimulation
-          </p>
-          <div className="glass-card rounded-3xl p-4 space-y-4">
-            <p className="text-white/80 text-lg text-center leading-relaxed">
-              Takes 3-5 minutes. We'll guide you through each step.
+      <>
+        {customActivityModal}
+        <div 
+          className="h-screen flex flex-col relative overflow-hidden items-center justify-center gap-8 p-6 max-w-lg mx-auto"
+        >
+            <h1 className="welcome-title text-center">
+              Welcome to Your<br />Dopamine Menu
+            </h1>
+            <p className="welcome-subtitle text-white/90 text-center leading-relaxed">
+              Create activities organized like a restaurant menu for when your brain needs stimulation
             </p>
-          </div>
-          <Button 
-            onClick={handleNext}
-            className="glass-button w-full h-16 text-lg font-semibold text-white border-0 rounded-2xl mt-2"
-          >
-            <span>Let's Get Started</span>
-            <ChevronRight className="w-6 h-6 ml-2" />
-          </Button>
-      </div>
+            <div className="glass-card rounded-3xl p-4 space-y-4">
+              <p className="text-white/80 text-lg text-center leading-relaxed">
+                Takes 3-5 minutes. We'll guide you through each step.
+              </p>
+            </div>
+            <Button 
+              onClick={handleNext}
+              className="glass-button w-full h-16 text-lg font-semibold text-white border-0 rounded-2xl mt-2"
+            >
+              <span>Let's Get Started</span>
+              <ChevronRight className="w-6 h-6 ml-2" />
+            </Button>
+        </div>
+      </>
     );
   }
 
   // Render regular onboarding steps
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-slate-200">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-slate-600">
-                Step {currentStep} of {steps.length - 1}
+    <>
+      {customActivityModal}
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        {/* Header */}
+        <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-slate-200">
+          <div className="max-w-2xl mx-auto px-4 py-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-slate-600">
+                  Step {currentStep} of {steps.length - 1}
+                </div>
+                <div className="text-sm text-slate-600">
+                  {Math.round(progress)}% complete
+                </div>
               </div>
-              <div className="text-sm text-slate-600">
-                {Math.round(progress)}% complete
-              </div>
+              <Progress value={progress} className="h-2" />
             </div>
-            <Progress value={progress} className="h-2" />
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-2">
-        <Card className="shadow-lg border-0 bg-slate-100">
-          <CardContent className="p-4 bg-slate-100 rounded-sm">
-            <div className="space-y-4">
-              <div className="text-center space-y-1">
-                <h1 className="text-xl sm:text-2xl font-bold text-black leading-tight">
-                  {currentStepData.title}
-                </h1>
-                <p className="text-slate-600">
-                  {currentStepData.subtitle}
-                </p>
-              </div>
-
+        {/* Content */}
+        <div className="max-w-xl mx-auto px-4 py-2">
+          <Card className="shadow-lg border-0 bg-slate-100">
+            <CardContent className="p-4 rounded-sm">
               <div className="space-y-4">
-                {currentStepData.content}
-              </div>
+                <div className="text-center space-y-1">
+                  <h1 className="text-xl sm:text-2xl font-bold text-black leading-tight">
+                    {currentStepData.title}
+                  </h1>
+                  <p className="text-slate-600">
+                    {currentStepData.subtitle}
+                  </p>
+                </div>
 
-              {/* Navigation */}
-              <div className="flex justify-between items-center gap-3 pt-4 border-t border-slate-200">
-                <Button 
-                  variant="outline" 
-                  onClick={handleBack}
-                  className="flex items-center space-x-2"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  <span>Back</span>
-                </Button>
-                
-                <Button 
-                  onClick={handleNext}
-                  disabled={createActivitiesBatchMutation.isPending || !canContinue()}
-                  className="flex items-center space-x-2 bg-primary text-primary-foreground"
-                >
-                  <span>
-                    {currentStep === steps.length - 1 ? 
-                      (createActivitiesBatchMutation.isPending ? "Setting up..." : "Start using my menu!") : 
-                      "Continue"
-                    }
-                  </span>
-                  {currentStep !== steps.length - 1 && <ChevronRight className="w-4 h-4" />}
-                </Button>
+                <div className="space-y-4">
+                  {currentStepData.content}
+                </div>
+
+                {/* Navigation */}
+                <div className="flex justify-between items-center gap-3 pt-4 border-t border-slate-200">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleBack}
+                    className="flex items-center space-x-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Back</span>
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleNext}
+                    disabled={createActivitiesBatchMutation.isPending || !canContinue()}
+                    className="flex items-center space-x-2 bg-primary text-primary-foreground"
+                  >
+                    <span>
+                      {currentStep === steps.length - 1 ? 
+                        (createActivitiesBatchMutation.isPending ? "Setting up..." : "Start using my menu!") : 
+                        "Continue"
+                      }
+                    </span>
+                    {currentStep !== steps.length - 1 && <ChevronRight className="w-4 h-4" />}
+                  </Button>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
