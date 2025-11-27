@@ -22,6 +22,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { insertActivitySchema, type CategoryType, categoryColors } from "@shared/schema";
@@ -49,6 +51,7 @@ const categoryOptions = [
 export default function AddActivityDialog({ category, open, onOpenChange }: AddActivityDialogProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -170,12 +173,28 @@ export default function AddActivityDialog({ category, open, onOpenChange }: AddA
                 <FormItem>
                   <FormLabel>Emoji</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="🎯"
-                      {...field} 
-                      className="adhd-focus text-2xl text-center"
-                      maxLength={2}
-                    />
+                    <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="adhd-focus h-12 w-full text-2xl"
+                        >
+                          {field.value || "🎯"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0 border-none w-[320px]" align="start">
+                        <EmojiPicker
+                          searchDisabled
+                          skinTonesDisabled
+                          previewConfig={{ showPreview: false }}
+                          onEmojiClick={({ emoji }: EmojiClickData) => {
+                            field.onChange(emoji);
+                            setEmojiPickerOpen(false);
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

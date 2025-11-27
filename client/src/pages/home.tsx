@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import AddActivityDialog from "@/components/add-activity-dialog";
 import CelebrationAnimation from "@/components/celebration-animation";
 import type { Activity, CategoryType } from "@shared/schema";
@@ -15,6 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTimer } from "@/hooks/use-timer";
 import { useUser } from "@stackframe/react";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 
 type ViewState = 'home' | 'category' | 'activity' | 'settings' | 'edit-activity';
 
@@ -62,6 +64,7 @@ export default function Home() {
   const [celebrationType, setCelebrationType] = useState<'completion' | 'streak' | 'goal' | 'first-time'>('completion');
   const [celebrationMessage, setCelebrationMessage] = useState('');
   const [username, setUsername] = useState(localStorage.getItem('userName') || 'User');
+  const [editEmojiPickerOpen, setEditEmojiPickerOpen] = useState(false);
   const user = useUser();
 
   // Activity editing form state
@@ -340,14 +343,14 @@ export default function Home() {
     const info = categoryInfo[selectedCategory];
 
     return (
-      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto flex flex-col">
         <div className="bg-shapes">
           <div className="shape"></div>
           <div className="shape"></div>
           <div className="shape"></div>
         </div>
 
-        <header className="flex flex-wrap items-center justify-between py-6 px-4 relative z-10 sm:flex-nowrap">
+        <header className="flex flex-wrap items-center justify-between py-6 px-4 relative z-10 sm:flex-nowrap flex-shrink-0">
           <Button 
             onClick={() => setViewState('home')} 
             className="glass-card p-3 border border-white/30 hover:border-white/50 shrink-0"
@@ -366,9 +369,9 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="pb-6 px-4 relative z-10">
+        <main className="pb-6 px-4 relative z-10 flex-1 overflow-y-auto">
           {categoryActivities.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-6">
               {categoryActivities.map((activity: Activity) => (
                 <div 
                   key={activity.id}
@@ -378,7 +381,9 @@ export default function Home() {
                   <div className="flex items-center space-x-4">
                     <div className="text-3xl">{activity.emoji || '⭐'}</div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-white text-lg">{activity.name}</h3>
+                      <h3 className="font-bold text-white text-lg">
+                        {activity.name.length > 25 ? `${activity.name.slice(0, 20)}...` : activity.name}
+                      </h3>
                       <div className="flex items-center space-x-3 text-white/70">
                         {activity.duration ? (
                           <span>{activity.duration} minute{activity.duration !== 1 ? 's' : ''}</span>
@@ -554,14 +559,28 @@ export default function Home() {
 
             <div>
               <Label htmlFor="emoji" className="text-white font-bold text-lg mb-2 block">Emoji</Label>
-              <Input
-                id="emoji"
-                value={editForm.emoji}
-                onChange={(e) => setEditForm({ ...editForm, emoji: e.target.value })}
-                placeholder="⭐"
-                maxLength={2}
-                className="glass-input text-3xl py-4 text-center"
-              />
+              <Popover open={editEmojiPickerOpen} onOpenChange={setEditEmojiPickerOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="glass-input text-3xl py-4 text-center w-full"
+                  >
+                    {editForm.emoji || "⭐"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0 border-none w-[320px]" align="start">
+                  <EmojiPicker
+                    searchDisabled
+                    skinTonesDisabled
+                    previewConfig={{ showPreview: false }}
+                    onEmojiClick={({ emoji }: EmojiClickData) => {
+                      setEditForm((prev) => ({ ...prev, emoji }));
+                      setEditEmojiPickerOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div>
