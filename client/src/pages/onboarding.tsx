@@ -71,6 +71,14 @@ const categoryInfo = {
 
 type ModalCategory = keyof typeof categoryInfo;
 
+type DisplayedActivity = {
+  name: string;
+  emoji?: string;
+  duration?: number;
+  description?: string;
+  source: 'custom' | 'template';
+};
+
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedActivities, setSelectedActivities] = useState<Record<CategoryType, string[]>>({
@@ -173,6 +181,31 @@ export default function Onboarding() {
     handleCloseCustomModal();
   };
 
+  const buildDisplayedActivities = (category: CategoryType): DisplayedActivity[] => {
+    const selected = selectedActivities[category] || [];
+
+    return selected.map((name) => {
+      const custom = customActivities[category].find(activity => activity.name === name);
+      if (custom) {
+        return {
+          name: custom.name,
+          emoji: custom.emoji,
+          duration: custom.duration,
+          source: 'custom',
+        };
+      }
+
+      const template = exampleActivities[category]?.find(activity => activity.name === name);
+      return {
+        name,
+        emoji: undefined,
+        duration: typeof template?.duration === 'number' ? template.duration : undefined,
+        description: template?.description ?? undefined,
+        source: 'template',
+      };
+    });
+  };
+
   const steps: OnboardingStep[] = [
     {
       id: "welcome",
@@ -195,74 +228,79 @@ export default function Onboarding() {
       )
     },
 
-    ...Object.entries(categoryInfo).map(([category, info]) => ({
-      id: category,
-      title: `Let's set up your ${info.title}`,
-      subtitle: info.subtitle,
-      content: (
+    ...Object.entries(categoryInfo).map(([category, info]) => {
+      const categoryKey = category as CategoryType;
+      const displayedActivities = buildDisplayedActivities(categoryKey);
+
+      return {
+        id: category,
+        title: `Let's set up your ${info.title}`,
+        subtitle: info.subtitle,
+        content: (
         <div className="space-y-6">
           <p className="text-sm text-slate-700">{info.description}</p>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1">
-              <Label htmlFor={`templates-${category}`} className="text-base font-semibold text-slate-800">
-                Include popular {info.title.toLowerCase()}
-              </Label>
-              <p className="text-sm text-slate-700 mt-1">Add tried-and-tested activities to get started</p>
-            </div>
-            <Switch
-                id={`templates-${category}`}
-                checked={includeTemplates[category as CategoryType]}
-                className="data-[state=unchecked]:bg-slate-300"
-                onCheckedChange={(checked) => {
-                setIncludeTemplates(prev => ({
-                  ...prev,
-                  [category]: checked
-                }));
-                if (checked) {
-                  // Add all template activities
-                  const templateNames = exampleActivities[category as CategoryType]?.map(a => a.name) || [];
-                  setSelectedActivities(prev => ({
-                    ...prev,
-                    [category]: Array.from(new Set([...prev[category as CategoryType], ...templateNames]))
-                  }));
-                } else {
-                  // Remove template activities but keep custom ones
-                  const templateNames = exampleActivities[category as CategoryType]?.map(a => a.name) || [];
-                  setSelectedActivities(prev => ({
-                    ...prev,
-                    [category]: prev[category as CategoryType].filter(name => !templateNames.includes(name))
-                  }));
-                }
-                }}
-              />
-          </div>  
-          {includeTemplates[category as CategoryType] && (
-            <div className="space-y-3">
-              <p className="text-sm text-slate-700 font-medium">Popular activities added:</p>
-              <div className="grid gap-2">
-                {exampleActivities[category as CategoryType]?.slice(0, 3).map((activity, index) => (
-                  <div key={index} className="text-sm p-3 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                    {activity.name}
-                  </div>
-                )) || []}
+
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-white/80 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-4 w-full">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => handleOpenCustomModal(category as ModalCategory)}
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+                <span className="h-6 w-0.5 bg-slate-300 block" />
+                <div className="flex items-center gap-2 text-sm text-slate-700">
+                  <Label htmlFor={`templates-${category}`} className="font-semibold text-slate-800">
+                    Pick popular
+                  </Label>
+                  <Switch
+                    id={`templates-${category}`}
+                    checked={includeTemplates[categoryKey]}
+                    className="data-[state=unchecked]:bg-slate-300"
+                    onCheckedChange={(checked) => {
+                      setIncludeTemplates(prev => ({
+                        ...prev,
+                        [category]: checked
+                      }));
+                      if (checked) {
+                        // Add all template activities
+                        const templateNames = exampleActivities[categoryKey]?.map(a => a.name) || [];
+                        setSelectedActivities(prev => ({
+                          ...prev,
+                          [category]: Array.from(new Set([...prev[categoryKey], ...templateNames]))
+                        }));
+                      } else {
+                        // Remove template activities but keep custom ones
+                        const templateNames = exampleActivities[categoryKey]?.map(a => a.name) || [];
+                        setSelectedActivities(prev => ({
+                          ...prev,
+                          [category]: prev[categoryKey].filter(name => !templateNames.includes(name))
+                        }));
+                      }
+                    }}
+                  />
+                </div>
               </div>
             </div>
-          )}
-          <div className="space-y-6 border-t">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2"
-              onClick={() => handleOpenCustomModal(category as ModalCategory)}
-            >
-              <Plus className="w-4 h-4" />
-              Add custom {info.title.toLowerCase()}
-            </Button>
+          </div>
 
-            {customActivities[category as CategoryType].length > 0 ? (  
-              <div className="space-y-3">
-                <p className="text-sm text-slate-700 font-medium">Your custom activities:</p>
-                {customActivities[category as CategoryType].map((activity, index) => (
-                  <div key={index} className="flex items-start justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="space-y-6 border-t pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-base font-semibold text-slate-800">
+                Selected activities ({displayedActivities.length})
+              </p>
+            </div>
+
+            {displayedActivities.length > 0 ? (
+              <div className="flex gap-3 overflow-x-auto pr-1 pb-1">
+                {displayedActivities.map((activity, index) => (
+                  <div
+                    key={`${activity.name}-${activity.source}-${index}`}
+                    className="min-w-[260px] flex-shrink-0 flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                  >
                     <div className="flex-1">
                       <div className="text-base font-medium text-blue-900">
                         {activity.emoji && <span className="mr-2">{activity.emoji}</span>}
@@ -278,13 +316,15 @@ export default function Onboarding() {
                       size="sm"
                       variant="ghost"
                       onClick={() => {
-                        setCustomActivities(prev => ({
-                          ...prev,
-                          [category as CategoryType]: prev[category as CategoryType].filter((_, i) => i !== index)
-                        }));
+                        if (activity.source === 'custom') {
+                          setCustomActivities(prev => ({
+                            ...prev,
+                            [categoryKey]: prev[categoryKey].filter(item => item.name !== activity.name)
+                          }));
+                        }
                         setSelectedActivities(prev => ({
                           ...prev,
-                          [category as CategoryType]: prev[category as CategoryType].filter(name => name !== activity.name)
+                          [categoryKey]: prev[categoryKey].filter(name => name !== activity.name)
                         }));
                       }}
                     >
@@ -293,9 +333,9 @@ export default function Onboarding() {
                   </div>
                 ))}
               </div>
-            ) : (
-              <p className="text-sm text-slate-500 italic">No custom {info.title.toLowerCase()} added yet.</p>
-            )}
+              ) : (
+                <p className="text-sm text-slate-500 italic">No {info.title.toLowerCase()} added yet.</p>
+              )}
           </div>
 
           {hasAttemptedContinue[category as CategoryType] && selectedActivities[category as CategoryType].length === 0 && (
@@ -305,17 +345,10 @@ export default function Onboarding() {
               </p>
             </div>
           )}
-          
-          {selectedActivities[category as CategoryType].length > 0 && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-800">
-                ✓ You have {selectedActivities[category as CategoryType]?.length || 0} activit{(selectedActivities[category as CategoryType]?.length || 0) === 1 ? 'y' : 'ies'} selected
-              </p>
-            </div>
-          )}
         </div>
       )
-    })),
+      };
+    }),
     {
       id: "complete",
       title: "Your dopamine menu is ready!",
@@ -507,7 +540,8 @@ export default function Onboarding() {
       <>
         {customActivityModal}
         <div 
-          className="h-screen flex flex-col relative overflow-hidden items-center justify-center gap-8 p-6 max-w-lg mx-auto"
+          className="flex flex-col relative overflow-hidden items-center justify-center gap-8 p-6 max-w-lg mx-auto"
+          style={{ height: '100dvh' }}
         >
             <h1 className="welcome-title text-center">
               Welcome to Your<br />Dopamine Menu
@@ -536,70 +570,79 @@ export default function Onboarding() {
   return (
     <>
       {customActivityModal}
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        {/* Header */}
-        <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-slate-200">
-          <div className="max-w-2xl mx-auto px-4 py-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-600">
-                  Step {currentStep} of {steps.length - 1}
+      <div
+        className="overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50"
+        style={{ height: '100dvh' }}
+      >
+        <div className="flex h-full flex-col">
+          {/* Header */}
+          <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-slate-200">
+            <div className="max-w-2xl mx-auto px-4 py-4">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-slate-600">
+                    Step {currentStep} of {steps.length - 1}
+                  </div>
+                  <div className="text-sm text-slate-600">
+                    {Math.round(progress)}% complete
+                  </div>
                 </div>
-                <div className="text-sm text-slate-600">
-                  {Math.round(progress)}% complete
-                </div>
+                <Progress value={progress} className="h-2" />
               </div>
-              <Progress value={progress} className="h-2" />
             </div>
           </div>
-        </div>
 
-        {/* Content */}
-        <div className="max-w-xl mx-auto px-4 py-2">
-          <Card className="shadow-lg border-0 bg-slate-100">
-            <CardContent className="p-4 rounded-sm">
-              <div className="space-y-4">
-                <div className="text-center space-y-1">
-                  <h1 className="text-xl sm:text-2xl font-bold text-black leading-tight">
-                    {currentStepData.title}
-                  </h1>
-                  <p className="text-slate-600">
-                    {currentStepData.subtitle}
-                  </p>
-                </div>
+          {/* Content */}
+          <div className="flex-1 overflow-hidden min-h-0">
+            <div className="h-full overflow-y-auto">
+              <div className="max-w-xl mx-auto px-4 py-2">
+                <Card className="shadow-lg border-0 bg-slate-100">
+                  <CardContent className="p-4 rounded-sm">
+                    <div className="space-y-4">
+                      <div className="text-center space-y-1">
+                        <h1 className="text-xl sm:text-2xl font-bold text-black leading-tight">
+                          {currentStepData.title}
+                        </h1>
+                        <p className="text-slate-600">
+                          {currentStepData.subtitle}
+                        </p>
+                      </div>
 
-                <div className="space-y-4">
-                  {currentStepData.content}
-                </div>
+                      <div className="space-y-4">
+                        {currentStepData.content}
+                      </div>
 
-                {/* Navigation */}
-                <div className="flex justify-between items-center gap-3 pt-4 border-t border-slate-200">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleBack}
-                    className="flex items-center space-x-2"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    <span>Back</span>
-                  </Button>
-                  
-                  <Button 
-                    onClick={handleNext}
-                    disabled={createActivitiesBatchMutation.isPending || !canContinue()}
-                    className="flex items-center space-x-2 bg-primary text-primary-foreground"
-                  >
-                    <span>
-                      {currentStep === steps.length - 1 ? 
-                        (createActivitiesBatchMutation.isPending ? "Setting up..." : "Start using my menu!") : 
-                        "Continue"
-                      }
-                    </span>
-                    {currentStep !== steps.length - 1 && <ChevronRight className="w-4 h-4" />}
-                  </Button>
-                </div>
+                      {/* Navigation */}
+                      <div className="flex justify-between items-center gap-3 pt-4 border-t border-slate-200">
+                        <Button 
+                          variant="outline" 
+                          onClick={handleBack}
+                          className="flex items-center space-x-2"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                          <span>Back</span>
+                        </Button>
+                        
+                        <Button 
+                          onClick={handleNext}
+                          disabled={createActivitiesBatchMutation.isPending || !canContinue()}
+                          className="flex items-center space-x-2 bg-primary text-primary-foreground"
+                        >
+                          <span>
+                            {currentStep === steps.length - 1 ? 
+                              (createActivitiesBatchMutation.isPending ? "Setting up..." : "Start using my menu!") : 
+                              "Continue"
+                            }
+                          </span>
+                          {currentStep !== steps.length - 1 && <ChevronRight className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </>
