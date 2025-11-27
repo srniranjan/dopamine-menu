@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -106,6 +108,7 @@ export default function Onboarding() {
   const [newActivityName, setNewActivityName] = useState('');
   const [newActivityEmoji, setNewActivityEmoji] = useState('');
   const [newActivityDuration, setNewActivityDuration] = useState<number | ''>('');
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [activeModalCategory, setActiveModalCategory] = useState<ModalCategory | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -125,10 +128,16 @@ export default function Onboarding() {
     },
   });
 
+  const handleEmojiSelect = ({ emoji }: EmojiClickData) => {
+    setNewActivityEmoji(emoji);
+    setEmojiPickerOpen(false);
+  };
+
   const resetCustomActivityForm = () => {
     setNewActivityName('');
     setNewActivityEmoji('');
     setNewActivityDuration('');
+    setEmojiPickerOpen(false);
   };
 
   const handleOpenCustomModal = (category: ModalCategory) => {
@@ -446,13 +455,26 @@ export default function Onboarding() {
                 onChange={(e) => setNewActivityName(e.target.value)}
               />
               <div className="flex gap-3">
-                <Input
-                  placeholder="🎵 Emoji"
-                  value={newActivityEmoji}
-                  onChange={(e) => setNewActivityEmoji(e.target.value)}
-                  className="w-24 text-center"
-                  maxLength={2}
-                />
+                <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="justify-center"
+                      aria-label="Choose emoji"
+                    >
+                      {newActivityEmoji || '🎵'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0 border-none w-[320px]" align="start">
+                    <EmojiPicker
+                      searchDisabled
+                      skinTonesDisabled
+                      previewConfig={{ showPreview: false }}
+                      onEmojiClick={handleEmojiSelect}
+                    />
+                  </PopoverContent>
+                </Popover>
                 <Input
                   type="number"
                   placeholder="Duration (minutes)"
