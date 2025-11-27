@@ -304,8 +304,8 @@ export default function Onboarding() {
                     <div className="flex-1">
                       <div className="text-base font-medium text-blue-900">
                         {activity.emoji && <span className="mr-2">{activity.emoji}</span>}
-                        {activity.name}
-                        {activity.duration && activity.duration > 0 && (
+                        {activity.name.length > 28 ? `${activity.name.slice(0, 15)}...` : activity.name}
+                        {(activity.duration ?? 0) > 0 && (
                           <span className="ml-2 text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">
                             {activity.duration}m
                           </span>
