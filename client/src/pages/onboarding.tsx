@@ -213,8 +213,8 @@ export default function Onboarding() {
       subtitle: "Let's create your personalized activity menu",
       content: (
         <div className="space-y-6 text-center">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-            <Heart className="w-10 h-10 text-white" />
+          <div className="mx-auto w-20 h-20 rounded-full bg-primary flex items-center justify-center">
+            <Heart className="w-10 h-10 text-primary-foreground" />
           </div>
           <div className="space-y-4">
             <p className="text-lg text-slate-800 leading-relaxed">
@@ -299,14 +299,14 @@ export default function Onboarding() {
                 {displayedActivities.map((activity, index) => (
                   <div
                     key={`${activity.name}-${activity.source}-${index}`}
-                    className="min-w-[260px] flex-shrink-0 flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                    className="min-w-[260px] flex-shrink-0 flex items-center justify-between p-3 bg-muted/80 border border-border rounded-lg"
                   >
                     <div className="flex-1">
-                      <div className="text-base font-medium text-blue-900">
+                      <div className="text-base font-medium text-foreground">
                         {activity.emoji && <span className="mr-2">{activity.emoji}</span>}
                         {activity.name.length > 28 ? `${activity.name.slice(0, 15)}...` : activity.name}
                         {(activity.duration ?? 0) > 0 && (
-                          <span className="ml-2 text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">
+                          <span className="ml-2 text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded">
                             {activity.duration}m
                           </span>
                         )}
@@ -328,7 +328,7 @@ export default function Onboarding() {
                         }));
                       }}
                     >
-                      <Trash2 className="w-3 h-3 text-blue-600 hover:text-blue-800" />
+                      <Trash2 className="w-3 h-3 text-muted-foreground hover:text-foreground" />
                     </Button>
                   </div>
                 ))}
@@ -355,8 +355,8 @@ export default function Onboarding() {
       subtitle: "Time to start using your personalized activity menu",
       content: (
         <div className="space-y-6 text-center">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-secondary to-accent rounded-full flex items-center justify-center">
-            <Check className="w-10 h-10 text-white" />
+          <div className="mx-auto w-20 h-20 rounded-full bg-primary flex items-center justify-center">
+            <Check className="w-10 h-10 text-primary-foreground" />
           </div>
           <div className="space-y-4">
             <p className="text-xl text-slate-800 leading-relaxed">
@@ -539,27 +539,28 @@ export default function Onboarding() {
     return (
       <>
         {customActivityModal}
-        <div 
-          className="flex flex-col relative overflow-hidden items-center justify-center gap-8 p-6 max-w-lg mx-auto"
+        <div
+          className="flex flex-col relative overflow-hidden items-center justify-center gap-8 p-6 max-w-lg mx-auto bg-background"
           style={{ height: '100dvh' }}
         >
             <h1 className="welcome-title text-center">
               Welcome to Your<br />Dopamine Menu
             </h1>
-            <p className="welcome-subtitle text-white/90 text-center leading-relaxed">
+            <p className="welcome-subtitle text-center leading-relaxed">
               Create activities organized like a restaurant menu for when your brain needs stimulation
             </p>
-            <div className="glass-card rounded-3xl p-4 space-y-4">
-              <p className="text-white/80 text-lg text-center leading-relaxed">
+            <div className="glass-card rounded-lg p-4 space-y-4 max-w-md w-full">
+              <p className="text-muted-foreground text-lg text-center leading-relaxed">
                 Takes 3-5 minutes. We'll guide you through each step.
               </p>
             </div>
-            <Button 
+            <Button
               onClick={handleNext}
-              className="glass-button w-full h-16 text-lg font-semibold text-white border-0 rounded-2xl mt-2"
+              className="w-full h-14 text-base font-semibold rounded-lg"
+              size="lg"
             >
-              <span>Let's Get Started</span>
-              <ChevronRight className="w-6 h-6 ml-2" />
+              <span>Get started</span>
+              <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
         </div>
       </>
@@ -571,12 +572,12 @@ export default function Onboarding() {
     <>
       {customActivityModal}
       <div
-        className="overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50"
+        className="overflow-hidden bg-background"
         style={{ height: '100dvh' }}
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-slate-200">
+          <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
             <div className="max-w-2xl mx-auto px-4 py-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -596,11 +597,11 @@ export default function Onboarding() {
           <div className="flex-1 overflow-hidden min-h-0">
             <div className="h-full overflow-y-auto">
               <div className="max-w-xl mx-auto px-4 py-2">
-                <Card className="shadow-lg border-0 bg-slate-100">
+                <Card className="shadow-sm border border-border bg-card">
                   <CardContent className="p-4 rounded-sm">
                     <div className="space-y-4">
                       <div className="text-center space-y-1">
-                        <h1 className="text-xl sm:text-2xl font-bold text-black leading-tight">
+                        <h1 className="text-xl sm:text-2xl font-semibold text-foreground leading-tight">
                           {currentStepData.title}
                         </h1>
                         <p className="text-slate-600">

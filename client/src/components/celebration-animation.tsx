@@ -17,10 +17,10 @@ const celebrationIcons = {
 };
 
 const celebrationColors = {
-  completion: 'text-green-500',
-  streak: 'text-yellow-500', 
-  goal: 'text-purple-500',
-  'first-time': 'text-blue-500',
+  completion: 'text-primary',
+  streak: 'text-primary',
+  goal: 'text-primary',
+  'first-time': 'text-primary',
 };
 
 export default function CelebrationAnimation({ show, type, message, onComplete }: CelebrationAnimationProps) {
@@ -56,7 +56,7 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
           onClick={onComplete}
         >
           {/* Particles */}
@@ -96,7 +96,7 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
               stiffness: 200,
               damping: 20
             }}
-            className="bg-white rounded-2xl p-8 shadow-2xl max-w-sm mx-4 text-center"
+            className="bg-card border border-border rounded-lg p-8 shadow-lg max-w-sm mx-4 text-center"
           >
             <motion.div
               animate={{ 
@@ -117,7 +117,7 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="text-xl font-bold text-gray-800 mb-2"
+              className="text-xl font-semibold text-foreground mb-2"
             >
               {type === 'completion' && "Activity Completed!"}
               {type === 'streak' && "Streak Milestone!"}
@@ -129,7 +129,7 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.5 }}
-              className="text-gray-600"
+              className="text-muted-foreground"
             >
               {message}
             </motion.p>
@@ -138,7 +138,7 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.7, type: "spring" }}
-              className="mt-4 text-xs text-gray-400"
+              className="mt-4 text-xs text-muted-foreground"
             >
               Tap anywhere to continue
             </motion.div>

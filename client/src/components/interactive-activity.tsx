@@ -25,8 +25,8 @@ interface InteractiveActivityProps {
 const JumpingJacksAnimation = ({ isActive }: { isActive: boolean }) => (
   <div className="flex items-center justify-center h-32">
     <div className={`w-16 h-16 transition-all duration-500 ${isActive ? 'animate-bounce' : ''}`}>
-      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-        <div className="text-white text-xs font-bold">🏃‍♀️</div>
+      <div className="w-full h-full bg-muted rounded-full flex items-center justify-center border border-border">
+        <div className="text-foreground text-xs font-medium">🏃‍♀️</div>
       </div>
     </div>
   </div>
@@ -49,8 +49,8 @@ const MusicServiceButtons = () => (
       className="flex items-center space-x-2 h-12"
       onClick={() => window.open('https://music.apple.com', '_blank')}
     >
-      <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-red-500 rounded flex items-center justify-center">
-        <Music className="w-4 h-4 text-white" />
+      <div className="w-6 h-6 bg-muted rounded border border-border flex items-center justify-center">
+        <Music className="w-4 h-4 text-foreground" />
       </div>
       <span className="text-sm">Apple Music</span>
     </Button>
@@ -339,7 +339,7 @@ export default function InteractiveActivity({ activity, onClose, onComplete }: I
           {phase === 'complete' && (
             <div className="text-center space-y-4">
               <div className="text-2xl">🎉</div>
-              <p className="font-semibold text-green-600">Great job! Activity completed!</p>
+              <p className="font-semibold text-foreground">Activity completed.</p>
               <p className="text-sm text-muted-foreground">
                 You've given your brain the dopamine boost it needed.
               </p>

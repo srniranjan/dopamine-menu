@@ -24,33 +24,27 @@ const categoryInfo = {
   appetizers: {
     name: "APPETIZERS",
     description: "Quick dopamine hits",
-    gradient: "from-indigo-500 to-blue-600"
   },
   entrees: {
-    name: "Entrées", 
+    name: "Entrées",
     description: "Main activities",
-    gradient: "from-pink-500 to-rose-600"
   },
   snacks: {
     name: "SNACKS",
-    description: "Light activities", 
-    gradient: "from-green-500 to-teal-600"
+    description: "Light activities",
   },
   desserts: {
     name: "DESSERTS",
-    description: "Pure indulgence", 
-    gradient: "from-orange-500 to-yellow-600"
+    description: "Pure indulgence",
   },
   sides: {
     name: "SIDES",
-    description: "Background vibes", 
-    gradient: "from-purple-500 to-violet-600"
+    description: "Background vibes",
   },
   specials: {
     name: "SPECIALS",
-    description: "Rare treats", 
-    gradient: "from-yellow-500 to-orange-600"
-  }
+    description: "Rare treats",
+  },
 };
 
 export default function Home() {
@@ -236,13 +230,8 @@ export default function Home() {
     return (
       <div className="vibrant-bg flex items-center justify-center min-h-screen">
         <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto"></div>
-          <p className="text-white text-lg font-semibold drop-shadow-lg">Loading your dopamine menu...</p>
-        </div>
-        <div className="bg-shapes">
-          <div className="shape"></div>
-          <div className="shape"></div>
-          <div className="shape"></div>
+          <div className="w-8 h-8 border-2 border-muted border-t-primary rounded-full animate-spin mx-auto" />
+          <p className="text-foreground text-lg font-medium">Loading your dopamine menu...</p>
         </div>
       </div>
     );
@@ -251,24 +240,20 @@ export default function Home() {
   // HOME SCREEN - 4 Category Menu
   if (viewState === 'home') {
     return (
-      <div className="h-screen flex flex-col gap-6 relative overflow-hidden max-w-lg mx-auto">
-        {/* Animated background shapes */}
-        <div className="bg-shapes">
-          <div className="shape"></div>
-          <div className="shape"></div>
-          <div className="shape"></div>
-        </div>
-
+      <div className="h-screen flex flex-col gap-6 relative overflow-hidden max-w-lg mx-auto bg-background">
         <header className="flex justify-between items-center p-6 relative z-10">
           <div>
-            <h1 className="text-2xl font-black text-white mb-1 tracking-wide">DOPAMINE MENU</h1>
-            <p className="text-white/80 text-sm font-medium">What sounds good right now?</p>
+            <h1 className="text-2xl font-semibold text-foreground mb-1 tracking-tight">Dopamine menu</h1>
+            <p className="text-muted-foreground text-sm">What sounds good right now?</p>
           </div>
-          <Button 
-            onClick={() => setViewState('settings')} 
-            className="glass-card p-2 border border-white/30 hover:border-white/50"
+          <Button
+            onClick={() => setViewState('settings')}
+            variant="outline"
+            size="icon"
+            className="glass-card shrink-0"
+            aria-label="Settings"
           >
-            <Settings className="w-5 h-5 text-white" />
+            <Settings className="w-5 h-5 text-foreground" />
           </Button>
         </header>
 
@@ -281,19 +266,19 @@ export default function Home() {
               const hasActivities = categorizedActivities[category].length > 0;
               
               return (
-                <div 
+                <div
                   key={category}
-                  className={`category-card cursor-pointer aspect-square hover:scale-105 ${category === 'appetizers' ? 'category-appetizers' : ''}
+                  className={`category-card cursor-pointer aspect-square ${category === 'appetizers' ? 'category-appetizers' : ''}
                   ${category === 'entrees' ? 'category-entrees' : ''}
                   ${category === 'sides' ? 'category-sides' : ''}
                   ${category === 'desserts' ? 'category-desserts' : ''}`}
                   onClick={() => handleCategorySelect(category)}
                 >
                   <div className="text-center h-full flex flex-col justify-center p-4">
-                    <h3 className="text-xl font-black text-white mb-2 tracking-wide leading-tight">{info.name}</h3>
-                    <p className="text-white/80 text-sm font-medium mb-4 leading-tight">{info.description}</p>
-                    <div className="inline-block bg-white/20 rounded-full px-4 py-2">
-                      <span className="text-white font-bold text-sm">
+                    <h3 className="text-lg font-semibold text-foreground mb-2 tracking-tight leading-tight">{info.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4 leading-tight">{info.description}</p>
+                    <div className="inline-block rounded-full bg-muted px-4 py-2">
+                      <span className="text-foreground font-medium text-sm">
                         {hasActivities ? `${categorizedActivities[category].length} item${categorizedActivities[category].length !== 1 ? 's' : ''}` : 'Add one now!'}
                       </span>
                     </div>
@@ -304,16 +289,16 @@ export default function Home() {
           </div>
           
           {/* Sides - full width, half height */}
-          <div 
-            className="category-card cursor-pointer category-specials hover:scale-105"
+          <div
+            className="category-card cursor-pointer category-specials"
             style={{ height: '120px' }}
             onClick={() => handleCategorySelect('specials')}
           >
             <div className="text-center h-full flex flex-col justify-center p-4">
-              <h3 className="text-xl font-black text-white mb-2 tracking-wide">{categoryInfo.specials.name}</h3>
-              <p className="text-white/80 text-sm font-medium mb-2">{categoryInfo.specials.description}</p>
-              <div className="inline-block bg-white/20 rounded-full px-4 py-1">
-                <span className="text-white font-bold text-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-2 tracking-tight">{categoryInfo.specials.name}</h3>
+              <p className="text-muted-foreground text-sm mb-2">{categoryInfo.specials.description}</p>
+              <div className="inline-block rounded-full bg-muted px-4 py-1">
+                <span className="text-foreground font-medium text-sm">
                   {categorizedActivities.specials.length > 0 ? `${categorizedActivities.specials.length} item${categorizedActivities.specials.length !== 1 ? 's' : ''}` : 'Add one now!'}
                 </span>
               </div>
@@ -343,30 +328,29 @@ export default function Home() {
     const info = categoryInfo[selectedCategory];
 
     return (
-      <div className="h-screen relative overflow-hidden max-w-lg mx-auto flex flex-col">
-        <div className="bg-shapes">
-          <div className="shape"></div>
-          <div className="shape"></div>
-          <div className="shape"></div>
-        </div>
-
-        <header className="flex flex-wrap items-center justify-between py-6 px-4 relative z-10 sm:flex-nowrap flex-shrink-0">
-          <Button 
-            onClick={() => setViewState('home')} 
-            className="glass-card p-3 border border-white/30 hover:border-white/50 shrink-0"
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto flex flex-col bg-background">
+        <header className="flex flex-wrap items-center justify-between gap-2 py-6 px-4 relative z-10 sm:flex-nowrap flex-shrink-0">
+          <Button
+            onClick={() => setViewState('home')}
+            variant="outline"
+            size="icon"
+            className="glass-card shrink-0"
+            aria-label="Back to menu"
           >
-            <ArrowLeft className="w-6 h-6 text-white" />
+            <ArrowLeft className="w-6 h-6 text-foreground" />
           </Button>
-          <div className="">
-            <h1 className="text-3xl font-black text-white tracking-wide mb-1">{info.name}</h1>
-            <p className="text-white/80 text-lg font-medium">{info.description}</p>
+          <div className="min-w-0 flex-1 text-center sm:text-left px-2">
+            <h1 className="text-2xl font-semibold text-foreground tracking-tight mb-1">{info.name}</h1>
+            <p className="text-muted-foreground text-base">{info.description}</p>
           </div>
-          <div className="">
-            <Button onClick={() => setShowAddDialog(true)} className="neon-button w-6 h-8 flex items-center justify-center p-0">
-              <Plus className="w-5 h-5" />
-              <span className="sr-only">Add</span>
-            </Button>
-          </div>
+          <Button
+            onClick={() => setShowAddDialog(true)}
+            size="icon"
+            className="neon-button shrink-0 h-10 w-10 p-0"
+            aria-label="Add activity"
+          >
+            <Plus className="w-5 h-5" />
+          </Button>
         </header>
 
         <main className="pb-6 px-4 relative z-10 flex-1 overflow-y-auto">
@@ -380,11 +364,11 @@ export default function Home() {
                 >
                   <div className="flex items-center space-x-4">
                     <div className="text-3xl">{activity.emoji || '⭐'}</div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-white text-lg">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground text-lg">
                         {activity.name.length > 25 ? `${activity.name.slice(0, 20)}...` : activity.name}
                       </h3>
-                      <div className="flex items-center space-x-3 text-white/70">
+                      <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-muted-foreground text-sm">
                         {activity.duration ? (
                           <span>{activity.duration} minute{activity.duration !== 1 ? 's' : ''}</span>
                         ) : (
@@ -401,11 +385,11 @@ export default function Home() {
           ) : (
             <div className="text-center py-16">
               <div className="text-6xl mb-6">🎯</div>
-              <h3 className="text-2xl font-black text-white mb-4">No {info.name.toLowerCase()} yet</h3>
-              <p className="text-white/80 text-lg mb-8">Ready to add some {info.description.toLowerCase()}?</p>
-              <Button onClick={() => setShowAddDialog(true)} className="neon-button text-xl px-12 py-6">
+              <h3 className="text-xl font-semibold text-foreground mb-4">No {info.name.toLowerCase()} yet</h3>
+              <p className="text-muted-foreground text-lg mb-8">Ready to add some {info.description.toLowerCase()}?</p>
+              <Button onClick={() => setShowAddDialog(true)} className="neon-button text-lg px-10 py-6 h-auto">
                 <Plus className="w-6 h-6 mr-3" />
-                Add Your First One
+                Add your first one
               </Button>
             </div>
           )}
@@ -430,71 +414,69 @@ export default function Home() {
     };
 
     return (
-      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
-        <div className="bg-shapes">
-          <div className="shape"></div>
-          <div className="shape"></div>
-          <div className="shape"></div>
-        </div>
-
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto bg-background">
         <header className="flex items-center justify-between px-6 pt-6 relative z-10">
-          <Button onClick={handleCancel} className="glass-card p-3 border border-white/30 hover:border-white/50">
-            <X className="w-6 h-6 text-white" />
+          <Button onClick={handleCancel} variant="outline" size="icon" className="glass-card" aria-label="Cancel">
+            <X className="w-6 h-6 text-foreground" />
           </Button>
-          <Button onClick={() => handleEditActivity(selectedActivity)} className="glass-card p-3 border border-white/30 hover:border-white/50">
-            <Edit3 className="w-6 h-6 text-white" />
+          <Button onClick={() => handleEditActivity(selectedActivity)} variant="outline" size="icon" className="glass-card" aria-label="Edit activity">
+            <Edit3 className="w-6 h-6 text-foreground" />
           </Button>
         </header>
 
         <main className="p-6 text-center space-y-8 relative z-10">
-          <div className="neon-accent p-4 rounded-2xl">
-            <h1 className="bold-title mb-4">{selectedActivity.name.toUpperCase()}</h1>
-            <p className="text-white/80 text-xl font-semibold capitalize">{selectedActivity.category.replace('_', ' ')}</p>
+          <div className="neon-accent">
+            <h1 className="bold-title mb-4">{selectedActivity.name}</h1>
+            <p className="text-muted-foreground text-lg font-medium capitalize">{selectedActivity.category.replace('_', ' ')}</p>
           </div>
 
           {isTimerActivity ? (
             <div className="space-y-8">
               <div className="glass-card p-8 mx-4">
-                <div className="bold-title font-black text-white mb-4 drop-shadow-lg">
+                <div className="text-5xl font-semibold tabular-nums tracking-tight text-foreground sm:text-6xl">
                   {formatTime(time)}
                 </div>
               </div>
-              
-              <div className="flex justify-center space-x-6">
+
+              <div className="flex justify-center gap-4">
                 <Button
                   onClick={isRunning ? pause : start}
-                  className="neon-button text-xl px-8 py-4"
+                  className="neon-button text-lg px-8 py-6 h-auto"
                 >
                   {isRunning ? <Pause className="w-8 h-8 mr-3" /> : <Play className="w-8 h-8 mr-3" />}
-                  {isRunning ? 'PAUSE' : 'START'}
+                  {isRunning ? 'Pause' : 'Start'}
                 </Button>
-                
+
                 <Button
                   onClick={() => setTime((selectedActivity.duration || 0) * 60)}
-                  className="glass-card p-4 border border-white/30 hover:border-white/50"
+                  variant="outline"
+                  size="icon"
+                  className="glass-card h-14 w-14 shrink-0"
+                  aria-label="Reset timer"
                 >
-                  <RotateCcw className="w-8 h-8 text-white" />
+                  <RotateCcw className="w-8 h-8 text-foreground" />
                 </Button>
               </div>
             </div>
           ) : (
             <div className="glass-card p-8 mx-4">
-              <p className="text-2xl text-white font-bold drop-shadow-lg">Ready to crush this?</p>
+              <p className="text-xl text-foreground font-medium">Ready when you are.</p>
             </div>
           )}
 
           <div className="space-y-4 px-4">
-            <Button 
+            <Button
               onClick={handleActivityComplete}
-              className="w-full neon-button text-2xl py-6"
+              className="w-full neon-button text-xl py-6 h-auto font-semibold"
             >
               <Check className="w-8 h-8 mr-3" />
-              COMPLETE
+              Complete
             </Button>
-            
-            <Button 
+
+            <Button
               onClick={handleCancel}
-              className="w-full glass-card border border-white/30 hover:border-white/50 text-white font-bold text-xl py-4"
+              variant="outline"
+              className="w-full glass-card text-foreground font-medium text-lg py-6 h-auto"
             >
               Cancel
             </Button>
@@ -530,24 +512,18 @@ export default function Home() {
   // EDIT ACTIVITY SCREEN
   if (viewState === 'edit-activity' && editingActivity) {
     return (
-      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
-        <div className="bg-shapes">
-          <div className="shape"></div>
-          <div className="shape"></div>
-          <div className="shape"></div>
-        </div>
-
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto bg-background">
         <header className="flex items-center p-6 gap-4 relative z-10">
-          <Button onClick={() => setViewState('activity')} className="glass-card p-3 mr-4 border border-white/30 hover:border-white/50">
-            <ArrowLeft className="w-6 h-6 text-white" />
+          <Button onClick={() => setViewState('activity')} variant="outline" size="icon" className="glass-card shrink-0" aria-label="Back">
+            <ArrowLeft className="w-6 h-6 text-foreground" />
           </Button>
-          <h1 className="text-3xl font-black text-white tracking-wide">EDIT ACTIVITY</h1>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Edit activity</h1>
         </header>
 
         <main className="p-6 space-y-8 relative z-10">
           <div className="space-y-6">
             <div>
-              <Label htmlFor="activity-name" className="text-white font-bold text-lg mb-2 block">Activity Name</Label>
+              <Label htmlFor="activity-name" className="text-foreground font-medium text-base mb-2 block">Activity name</Label>
               <Input
                 id="activity-name"
                 value={editForm.name}
@@ -558,7 +534,7 @@ export default function Home() {
             </div>
 
             <div>
-              <Label htmlFor="emoji" className="text-white font-bold text-lg mb-2 block">Emoji</Label>
+              <Label htmlFor="emoji" className="text-foreground font-medium text-base mb-2 block">Emoji</Label>
               <Popover open={editEmojiPickerOpen} onOpenChange={setEditEmojiPickerOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -584,7 +560,7 @@ export default function Home() {
             </div>
 
             <div>
-              <Label htmlFor="duration" className="text-white font-bold text-lg mb-2 block">Duration (minutes, 0 = instant)</Label>
+              <Label htmlFor="duration" className="text-foreground font-medium text-base mb-2 block">Duration (minutes, 0 = instant)</Label>
               <Input
                 id="duration"
                 type="number"
@@ -596,29 +572,29 @@ export default function Home() {
             </div>
 
             <div>
-              <Label htmlFor="category" className="text-white font-bold text-lg mb-2 block">Category</Label>
+              <Label htmlFor="category" className="text-foreground font-medium text-base mb-2 block">Category</Label>
               <Select
                 value={editForm.category}
                 onValueChange={(value) => setEditForm({ ...editForm, category: value as CategoryType })}
               >
-                <SelectTrigger className="glass-input text-white text-xl py-4 font-semibold">
+                <SelectTrigger className="glass-input text-xl py-4 font-medium">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="glass-card border border-white/30">
-                  <SelectItem value="appetizers" className="text-white font-semibold">⚡ APPETIZERS (Quick activities)</SelectItem>
-                  <SelectItem value="entrees" className="text-white font-semibold">🔥 MEALS (Main activities)</SelectItem>
-                  <SelectItem value="sides" className="text-white font-semibold">🌊 SIDES (Background activities)</SelectItem>
-                  <SelectItem value="desserts" className="text-white font-semibold">✨ DESSERTS (Indulgences)</SelectItem>
+                <SelectContent className="glass-card">
+                  <SelectItem value="appetizers">Appetizers (quick activities)</SelectItem>
+                  <SelectItem value="entrees">Entrées (main activities)</SelectItem>
+                  <SelectItem value="sides">Sides (background activities)</SelectItem>
+                  <SelectItem value="desserts">Desserts (indulgences)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="flex flex-col space-y-4">
-            <Button onClick={handleSaveEdit} className="neon-button text-xl py-6">
-              SAVE CHANGES
+            <Button onClick={handleSaveEdit} className="neon-button text-lg py-6 h-auto font-semibold">
+              Save changes
             </Button>
-            <Button onClick={() => setViewState('activity')} className="glass-button bg-transparent text-xl py-6">
+            <Button onClick={() => setViewState('activity')} variant="outline" className="text-lg py-6 h-auto">
               Cancel
             </Button>
           </div>
@@ -630,54 +606,50 @@ export default function Home() {
   // SETTINGS SCREEN
   if (viewState === 'settings') {
     return (
-      <div className="h-screen relative overflow-hidden max-w-lg mx-auto">
-        <div className="bg-shapes">
-          <div className="shape"></div>
-          <div className="shape"></div>
-          <div className="shape"></div>
-        </div>
-
-        <header className="flex items-center p-6 relative z-10">
-          <Button onClick={() => setViewState('home')} className="glass-card p-3 mr-4 border border-white/30 hover:border-white/50">
-            <ArrowLeft className="w-6 h-6 text-white" />
+      <div className="h-screen relative overflow-hidden max-w-lg mx-auto bg-background">
+        <header className="flex items-center p-6 relative z-10 gap-4">
+          <Button onClick={() => setViewState('home')} variant="outline" size="icon" className="glass-card shrink-0" aria-label="Back">
+            <ArrowLeft className="w-6 h-6 text-foreground" />
           </Button>
-          <h1 className="text-3xl font-black text-white tracking-wide">SETTINGS</h1>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Settings</h1>
         </header>
 
         <main className="p-6 space-y-6 relative z-10">
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button className="w-full glass-card border border-red-400/50 text-red-300 hover:border-red-400 text-xl py-6 font-bold">
-                Clear All Activities
+              <Button variant="destructive" className="w-full text-lg py-6 h-auto font-medium">
+                Clear all activities
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="glass-card border border-white/30">
+            <AlertDialogContent className="glass-card">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-white text-xl font-bold">Clear all activities?</AlertDialogTitle>
-                <AlertDialogDescription className="text-white/80">
+                <AlertDialogTitle className="text-xl font-semibold">Clear all activities?</AlertDialogTitle>
+                <AlertDialogDescription className="text-muted-foreground">
                   This will permanently delete all your activities and progress. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="glass-card border border-white/30 text-white hover:border-white/50">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => clearAllMutation.mutate()} className="neon-button">
-                  Clear All
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => clearAllMutation.mutate()} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Clear all
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
 
-          <Button 
+          <Button
             onClick={handleLogout}
-            className="w-full glass-card border border-white/30 hover:border-white/50 text-white font-bold text-xl py-6"
+            variant="outline"
+            className="w-full glass-card text-foreground font-medium text-lg py-6 h-auto"
           >
-            Logout
+            Log out
           </Button>
 
-          <Button 
-            className="w-full glass-card border border-white/30 hover:border-white/50 text-white font-bold text-xl py-6"
+          <Button
+            variant="outline"
+            className="w-full glass-card text-foreground font-medium text-lg py-6 h-auto"
           >
-            About & Info
+            About
           </Button>
         </main>
       </div>
