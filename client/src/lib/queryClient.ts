@@ -4,8 +4,8 @@ import {
   type QueryKey,
 } from "@tanstack/react-query";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? undefined;
+const rawBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "").trim();
+const API_BASE_URL = rawBase || undefined;
 
 const isAbsoluteUrl = (url: string) => /^https?:\/\//i.test(url);
 

@@ -1,6 +1,21 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Settings, Plus, Edit3, Play, Pause, Check, X, RotateCcw } from "lucide-react";
+import {
+  ArrowLeft,
+  Settings,
+  Plus,
+  Edit3,
+  Play,
+  Pause,
+  Check,
+  X,
+  RotateCcw,
+  Coffee,
+  UtensilsCrossed,
+  Headphones,
+  Cake,
+  Star,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -46,6 +61,14 @@ const categoryInfo = {
     description: "Rare treats",
   },
 };
+
+const homeCategoryIcons = {
+  appetizers: Coffee,
+  entrees: UtensilsCrossed,
+  sides: Headphones,
+  desserts: Cake,
+  specials: Star,
+} as const;
 
 export default function Home() {
   const [viewState, setViewState] = useState<ViewState>('home');
@@ -240,70 +263,95 @@ export default function Home() {
   // HOME SCREEN - 4 Category Menu
   if (viewState === 'home') {
     return (
-      <div className="h-screen flex flex-col gap-6 relative overflow-hidden max-w-lg mx-auto bg-background">
-        <header className="flex justify-between items-center p-6 relative z-10">
-          <div>
-            <h1 className="text-2xl font-semibold text-foreground mb-1 tracking-tight">Dopamine menu</h1>
-            <p className="text-muted-foreground text-sm">What sounds good right now?</p>
+      <div className="flex h-screen max-w-lg flex-col overflow-hidden bg-background mx-auto">
+        <header className="flex shrink-0 items-start justify-between gap-4 border-b border-border bg-background px-5 py-5">
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+              Dopamine menu
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">What sounds good right now?</p>
           </div>
           <Button
             onClick={() => setViewState('settings')}
             variant="outline"
             size="icon"
-            className="glass-card shrink-0"
+            className="shrink-0 border-border bg-card shadow-sm"
             aria-label="Settings"
           >
-            <Settings className="w-5 h-5 text-foreground" />
+            <Settings className="h-5 w-5 text-foreground" />
           </Button>
         </header>
 
-        <main className="relative px-6 z-10 flex-1 flex flex-col">
-          {/* Main 2x2 grid */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            {['appetizers', 'entrees', 'sides', 'desserts'].map((key) => {
-              const category = key as CategoryType;
+        <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto bg-muted/40 px-4 pb-6 pt-4">
+          <div className="grid grid-cols-2 gap-3">
+            {(['appetizers', 'entrees', 'sides', 'desserts'] as const).map((category) => {
               const info = categoryInfo[category];
-              const hasActivities = categorizedActivities[category].length > 0;
-              
+              const count = categorizedActivities[category].length;
+              const hasActivities = count > 0;
+              const Icon = homeCategoryIcons[category];
+
               return (
-                <div
+                <button
                   key={category}
-                  className={`category-card cursor-pointer aspect-square ${category === 'appetizers' ? 'category-appetizers' : ''}
-                  ${category === 'entrees' ? 'category-entrees' : ''}
-                  ${category === 'sides' ? 'category-sides' : ''}
-                  ${category === 'desserts' ? 'category-desserts' : ''}`}
+                  type="button"
                   onClick={() => handleCategorySelect(category)}
+                  className="group flex aspect-square flex-col items-center justify-between rounded-xl border border-border bg-card p-3 text-left shadow-sm transition-all hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  <div className="text-center h-full flex flex-col justify-center p-4">
-                    <h3 className="text-lg font-semibold text-foreground mb-2 tracking-tight leading-tight">{info.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-4 leading-tight">{info.description}</p>
-                    <div className="inline-block rounded-full bg-muted px-4 py-2">
-                      <span className="text-foreground font-medium text-sm">
-                        {hasActivities ? `${categorizedActivities[category].length} item${categorizedActivities[category].length !== 1 ? 's' : ''}` : 'Add one now!'}
-                      </span>
-                    </div>
+                  <div className="flex w-full flex-col items-center text-center">
+                    <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+                      <Icon className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+                    </span>
+                    <h3 className="text-xs font-semibold uppercase leading-tight tracking-wide text-foreground">
+                      {info.name}
+                    </h3>
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground sm:text-xs">
+                      {info.description}
+                    </p>
                   </div>
-                </div>
+                  <span
+                    className={`mt-2 inline-flex w-full justify-center rounded-full border px-2 py-1 text-[11px] font-medium tabular-nums sm:text-xs ${
+                      hasActivities
+                        ? 'border-primary/25 bg-primary/5 text-primary'
+                        : 'border-transparent bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {hasActivities
+                      ? `${count} ${count === 1 ? 'item' : 'items'}`
+                      : 'Add one'}
+                  </span>
+                </button>
               );
             })}
           </div>
-          
-          {/* Sides - full width, half height */}
-          <div
-            className="category-card cursor-pointer category-specials"
-            style={{ height: '120px' }}
+
+          <button
+            type="button"
             onClick={() => handleCategorySelect('specials')}
+            className="group mt-3 flex min-h-[112px] w-full shrink-0 items-center gap-4 rounded-xl border border-border bg-card px-4 py-3 text-left shadow-sm transition-all hover:border-primary/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-[120px]"
           >
-            <div className="text-center h-full flex flex-col justify-center p-4">
-              <h3 className="text-lg font-semibold text-foreground mb-2 tracking-tight">{categoryInfo.specials.name}</h3>
-              <p className="text-muted-foreground text-sm mb-2">{categoryInfo.specials.description}</p>
-              <div className="inline-block rounded-full bg-muted px-4 py-1">
-                <span className="text-foreground font-medium text-sm">
-                  {categorizedActivities.specials.length > 0 ? `${categorizedActivities.specials.length} item${categorizedActivities.specials.length !== 1 ? 's' : ''}` : 'Add one now!'}
-                </span>
-              </div>
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+              <Star className="h-6 w-6" strokeWidth={1.75} aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
+                {categoryInfo.specials.name}
+              </h3>
+              <p className="mt-0.5 text-sm text-muted-foreground">{categoryInfo.specials.description}</p>
             </div>
-          </div>
+            <span
+              className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium tabular-nums ${
+                categorizedActivities.specials.length > 0
+                  ? 'border-primary/25 bg-primary/5 text-primary'
+                  : 'border-transparent bg-muted text-muted-foreground'
+              }`}
+            >
+              {categorizedActivities.specials.length > 0
+                ? `${categorizedActivities.specials.length} ${
+                    categorizedActivities.specials.length === 1 ? 'item' : 'items'
+                  }`
+                : 'Add one'}
+            </span>
+          </button>
         </main>
 
         <AddActivityDialog
