@@ -15,6 +15,7 @@ import {
   Headphones,
   Cake,
   Star,
+  Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +29,7 @@ import AddActivityDialog from "@/components/add-activity-dialog";
 import CelebrationAnimation from "@/components/celebration-animation";
 import type { Activity, CategoryType } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { shareApp } from "@/lib/share";
 import { useToast } from "@/hooks/use-toast";
 import { useTimer } from "@/hooks/use-timer";
 import { useUser } from "@stackframe/react";
@@ -684,6 +686,15 @@ export default function Home() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+
+          <Button
+            onClick={() => shareApp(toast)}
+            variant="outline"
+            className="w-full glass-card text-foreground font-medium text-lg py-6 h-auto"
+          >
+            <Share2 className="w-5 h-5 mr-2" />
+            Share Dopamine Menu
+          </Button>
 
           <Button
             onClick={handleLogout}

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Trophy, Star, Zap } from "lucide-react";
+import { Sparkles, Trophy, Star, Zap, Share2 } from "lucide-react";
+import { shareApp } from "@/lib/share";
+import { useToast } from "@/hooks/use-toast";
 
 interface CelebrationAnimationProps {
   show: boolean;
@@ -25,7 +27,8 @@ const celebrationColors = {
 
 export default function CelebrationAnimation({ show, type, message, onComplete }: CelebrationAnimationProps) {
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
-  
+  const { toast } = useToast();
+
   useEffect(() => {
     if (show) {
       // Generate random particles
@@ -36,15 +39,23 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
         delay: Math.random() * 0.5,
       }));
       setParticles(newParticles);
-      
-      // Auto-hide after animation
+
+      // Auto-hide after animation. Slightly longer than the original 2.5s
+      // to give users time to notice and tap the share CTA.
       const timer = setTimeout(() => {
         onComplete?.();
-      }, 2500);
-      
+      }, 4000);
+
       return () => clearTimeout(timer);
     }
   }, [show, onComplete]);
+
+  const handleShareClick = (e: React.MouseEvent) => {
+    // Prevent the backdrop's onClick={onComplete} from dismissing the modal
+    // before the OS share sheet has a chance to open.
+    e.stopPropagation();
+    void shareApp(toast);
+  };
   
   const Icon = celebrationIcons[type];
   const colorClass = celebrationColors[type];
@@ -133,11 +144,23 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
             >
               {message}
             </motion.p>
-            
+
+            <motion.button
+              type="button"
+              onClick={handleShareClick}
+              initial={{ y: 10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="mt-5 inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background/60 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+              Share with a friend
+            </motion.button>
+
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.7, type: "spring" }}
+              transition={{ delay: 0.8, type: "spring" }}
               className="mt-4 text-xs text-muted-foreground"
             >
               Tap anywhere to continue
