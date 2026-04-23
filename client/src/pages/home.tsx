@@ -688,7 +688,7 @@ export default function Home() {
           </AlertDialog>
 
           <Button
-            onClick={() => shareApp(toast)}
+            onClick={() => shareApp(toast, 'settings')}
             variant="outline"
             className="w-full glass-card text-foreground font-medium text-lg py-6 h-auto"
           >

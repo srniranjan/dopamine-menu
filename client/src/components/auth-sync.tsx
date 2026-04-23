@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useUser } from '@stackframe/react';
 import { useToast } from '@/hooks/use-toast';
 import { buildApiUrl, setStackUserId, withStackUserHeader } from '@/lib/queryClient';
+import { getInitialAttribution, identify, reset } from '@/lib/posthog';
 
 export function AuthSync() {
   const stackUser = useUser();
@@ -13,6 +14,35 @@ export function AuthSync() {
   useEffect(() => {
     setStackUserId(stackUser?.id ?? null);
   }, [stackUser?.id]);
+
+  // Sync auth identity to PostHog so retention and attribution roll up
+  // per real user instead of per anonymous device.
+  useEffect(() => {
+    if (stackUser === undefined) return;
+
+    if (stackUser === null) {
+      reset();
+      return;
+    }
+
+    const attribution = getInitialAttribution();
+    const setOnce: Record<string, unknown> = {
+      initial_referrer:
+        typeof document !== 'undefined' ? document.referrer || 'direct' : 'direct',
+      ...Object.fromEntries(
+        Object.entries(attribution).map(([k, v]) => [`initial_${k}`, v]),
+      ),
+    };
+
+    identify(
+      stackUser.id,
+      {
+        email: stackUser.primaryEmail || undefined,
+        name: stackUser.displayName || undefined,
+      },
+      setOnce,
+    );
+  }, [stackUser]);
 
   useEffect(() => {
     const prevUser = prevUserRef.current;

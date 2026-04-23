@@ -1,37 +1,71 @@
-const SHARE_URL = "https://dopamine.menu/";
+import { capture } from "@/lib/posthog";
+
+const SHARE_BASE_URL = "https://dopamine.menu/";
 const SHARE_TITLE = "Dopamine Menu";
 const SHARE_TEXT = "A little menu to help you pick what to do next. Try it:";
 
+export type ShareSource = "settings" | "celebration";
+
 type ToastFn = (opts: { title: string; description?: string }) => void;
 
-export async function shareApp(toast?: ToastFn): Promise<void> {
+function buildShareUrl(source: ShareSource): string {
+  const url = new URL(SHARE_BASE_URL);
+  url.searchParams.set("ref", source);
+  return url.toString();
+}
+
+export async function shareApp(
+  toast: ToastFn | undefined,
+  source: ShareSource,
+): Promise<void> {
+  const shareUrl = buildShareUrl(source);
   const shareData = {
     title: SHARE_TITLE,
     text: SHARE_TEXT,
-    url: SHARE_URL,
+    url: shareUrl,
   };
 
+  let mechanism: "native" | "clipboard" | "unavailable" = "unavailable";
+  let dismissed = false;
+  let succeeded = false;
+
   if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+    mechanism = "native";
     try {
       await navigator.share(shareData);
-      return;
+      succeeded = true;
     } catch (err) {
-      // AbortError = user dismissed the share sheet, treat as success-no-op.
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      // Fall through to clipboard fallback on other errors.
+      if (err instanceof DOMException && err.name === "AbortError") {
+        dismissed = true;
+      } else {
+        // Fall through to clipboard fallback on other errors.
+        mechanism = "clipboard";
+      }
+    }
+  } else {
+    mechanism = "clipboard";
+  }
+
+  if (!succeeded && !dismissed && mechanism === "clipboard") {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast?.({
+        title: "Link copied!",
+        description: "Paste it anywhere to share.",
+      });
+      succeeded = true;
+    } catch {
+      toast?.({
+        title: "Couldn't share",
+        description: shareUrl,
+      });
     }
   }
 
-  try {
-    await navigator.clipboard.writeText(SHARE_URL);
-    toast?.({
-      title: "Link copied!",
-      description: "Paste it anywhere to share.",
-    });
-  } catch {
-    toast?.({
-      title: "Couldn't share",
-      description: SHARE_URL,
-    });
-  }
+  capture("share_clicked", {
+    source,
+    mechanism,
+    dismissed,
+    succeeded,
+  });
 }

@@ -11,6 +11,7 @@ import { useEffect, Suspense } from "react";
 import { StackHandler, StackProvider, StackTheme, useUser } from '@stackframe/react';
 import { stackClientApp } from './stack';
 import { AuthSync } from '@/components/auth-sync';
+import { usePageViews } from '@/hooks/use-pageviews';
 
 function HandlerRoutes() {
   const [location] = useLocation();
@@ -48,6 +49,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function Router() {
   const [location, navigate] = useLocation();
   const user = useUser();
+  usePageViews();
   
   // Check if user has completed onboarding
   const { data: activities = [], isLoading } = useQuery({

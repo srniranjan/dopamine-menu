@@ -54,7 +54,7 @@ export default function CelebrationAnimation({ show, type, message, onComplete }
     // Prevent the backdrop's onClick={onComplete} from dismissing the modal
     // before the OS share sheet has a chance to open.
     e.stopPropagation();
-    void shareApp(toast);
+    void shareApp(toast, 'celebration');
   };
   
   const Icon = celebrationIcons[type];
